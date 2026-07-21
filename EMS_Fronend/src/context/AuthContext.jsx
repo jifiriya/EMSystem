@@ -8,7 +8,14 @@ if (import.meta.env.VITE_API_URL) {
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('pulsehr_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [token, setToken] = useState(localStorage.getItem('pulsehr_token') || null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(localStorage.getItem('pulsehr_theme') || 'light');
@@ -29,10 +36,14 @@ export const AuthProvider = ({ children }) => {
         try {
           const res = await axios.get('/api/auth/me');
           setUser(res.data);
+          localStorage.setItem('pulsehr_user', JSON.stringify(res.data));
         } catch (err) {
           console.error('Session expired or invalid token');
           logout();
         }
+      } else {
+        setUser(null);
+        localStorage.removeItem('pulsehr_user');
       }
       setLoading(false);
     };
@@ -46,6 +57,7 @@ export const AuthProvider = ({ children }) => {
       const { token: authToken, user: userData } = res.data;
 
       localStorage.setItem('pulsehr_token', authToken);
+      localStorage.setItem('pulsehr_user', JSON.stringify(userData));
       axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
       
       setToken(authToken);
@@ -69,6 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('pulsehr_token');
+    localStorage.removeItem('pulsehr_user');
     delete axios.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);

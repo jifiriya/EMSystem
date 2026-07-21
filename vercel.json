@@ -1,4 +1,11 @@
 {
-  "buildCommand": "cd EMS_Fronend && npm install && npm run build",
-  "outputDirectory": "EMS_Fronend/dist"
+  "installCommand": "cd EMS_Fronend && npm install",
+  "buildCommand": "cd EMS_Fronend && npm run build",
+  "outputDirectory": "EMS_Fronend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
