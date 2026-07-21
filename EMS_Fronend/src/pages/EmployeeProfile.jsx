@@ -104,20 +104,20 @@ export default function EmployeeProfile({ onMenuToggle }) {
         }}>
           <div style={{
             height: '140px',
-            background: 'linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%)',
+            background: 'linear-gradient(135deg, #4f46e5 0%, #312e81 100%)',
             position: 'relative'
           }} />
 
-          <div style={{
-            padding: '0 2rem 1.5rem',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            marginTop: '-50px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <div style={{ padding: '0 2rem 1.5rem' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1.25rem',
+              marginTop: '-55px',
+              marginBottom: '0.75rem'
+            }}>
               <img 
                 src={employee.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.firstName + ' ' + employee.lastName)}&background=4f46e5&color=fff`} 
                 alt={`${employee.firstName} ${employee.lastName}`}
@@ -127,40 +127,41 @@ export default function EmployeeProfile({ onMenuToggle }) {
                   borderRadius: '50%',
                   objectFit: 'cover',
                   border: '4px solid var(--bg-surface)',
-                  boxShadow: 'var(--shadow-md)'
+                  boxShadow: 'var(--shadow-md)',
+                  backgroundColor: 'var(--bg-surface)'
                 }}
               />
 
-              <div style={{ paddingBottom: '0.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>
-                    {employee.firstName} {employee.lastName}
-                  </h2>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, padding: '0.2rem 0.5rem', background: 'var(--bg-primary)', borderRadius: '6px', border: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
-                    {employee.employeeId}
-                  </span>
-                  <span className={`badge badge-${employee.status.toLowerCase().replace(' ', '')}`}>
-                    {employee.status}
-                  </span>
+              {isAdmin && (
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.25rem' }}>
+                  <button className="btn btn-secondary" onClick={() => setIsEditModalOpen(true)}>
+                    <Edit3 size={16} />
+                    <span>Edit Profile</span>
+                  </button>
+                  <button className="btn btn-secondary" style={{ color: '#ef4444' }} onClick={handleDelete}>
+                    <Trash2 size={16} />
+                    <span>Remove</span>
+                  </button>
                 </div>
-                <p style={{ color: 'var(--accent-primary)', fontWeight: 600, fontSize: '1.05rem', margin: '0.25rem 0 0' }}>
-                  {employee.role}
-                </p>
-              </div>
+              )}
             </div>
 
-            {isAdmin && (
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button className="btn btn-secondary" onClick={() => setIsEditModalOpen(true)}>
-                  <Edit3 size={16} />
-                  <span>Edit Profile</span>
-                </button>
-                <button className="btn btn-secondary" style={{ color: '#ef4444' }} onClick={handleDelete}>
-                  <Trash2 size={16} />
-                  <span>Remove</span>
-                </button>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+                  {employee.firstName} {employee.lastName}
+                </h2>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, padding: '0.2rem 0.5rem', background: 'var(--bg-primary)', borderRadius: '6px', border: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
+                  {employee.employeeId}
+                </span>
+                <span className={`badge badge-${employee.status.toLowerCase().replace(' ', '')}`}>
+                  {employee.status}
+                </span>
               </div>
-            )}
+              <p style={{ color: 'var(--accent-primary)', fontWeight: 600, fontSize: '1.05rem', margin: '0.25rem 0 0' }}>
+                {employee.role}
+              </p>
+            </div>
           </div>
         </div>
 
