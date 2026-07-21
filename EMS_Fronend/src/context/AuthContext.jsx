@@ -30,6 +30,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // Interceptor to clear session automatically on 401 Unauthorized response
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          console.warn('Session expired or unauthorized. Logging out...');
+          logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+
     const initAuth = async () => {
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -49,6 +61,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     initAuth();
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
   }, [token]);
 
   const login = async (email, password) => {

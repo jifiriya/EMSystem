@@ -1,6 +1,14 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'pulsehr_secret_key_2026_super_secure';
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is missing.');
+  }
+  return secret;
+};
+
+const JWT_SECRET = process.env.JWT_SECRET || getJwtSecret();
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;

@@ -7,7 +7,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const router = express.Router();
 
 // @route  GET /api/dashboard/stats
-// @desc   Get dashboard metrics and statistics
+// @desc   Get dashboard metrics and statistics (Optimized queries)
 router.get('/stats', authMiddleware, asyncHandler(async (req, res) => {
   const [
     totalEmployees,
@@ -17,7 +17,8 @@ router.get('/stats', authMiddleware, asyncHandler(async (req, res) => {
     totalDepartments,
     payrollAgg,
     recentHires,
-    departments
+    departments,
+    deptCounts
   ] = await Promise.all([
     Employee.countDocuments(),
     Employee.countDocuments({ status: 'Active' }),
@@ -26,24 +27,25 @@ router.get('/stats', authMiddleware, asyncHandler(async (req, res) => {
     Department.countDocuments(),
     Employee.aggregate([{ $group: { _id: null, totalSalary: { $sum: '$salary' } } }]),
     Employee.find().populate('department', 'name code').sort({ createdAt: -1 }).limit(5),
-    Department.find().lean()
+    Department.find().lean(),
+    Employee.aggregate([{ $group: { _id: '$department', count: { $sum: 1 } } }])
   ]);
 
   const totalSalary = payrollAgg.length > 0 ? payrollAgg[0].totalSalary : 0;
 
-  const deptDistribution = await Promise.all(
-    departments.map(async (dept) => {
-      const count = await Employee.countDocuments({ department: dept._id });
-      const percentage = totalEmployees > 0 ? Math.round((count / totalEmployees) * 100) : 0;
-      return {
-        id: dept._id,
-        name: dept.name,
-        code: dept.code,
-        employeeCount: count,
-        percentage
-      };
-    })
-  );
+  const countMap = new Map(deptCounts.map(item => [item._id ? item._id.toString() : '', item.count]));
+
+  const deptDistribution = departments.map((dept) => {
+    const count = countMap.get(dept._id.toString()) || 0;
+    const percentage = totalEmployees > 0 ? Math.round((count / totalEmployees) * 100) : 0;
+    return {
+      id: dept._id,
+      name: dept.name,
+      code: dept.code,
+      employeeCount: count,
+      percentage
+    };
+  });
 
   res.json({
     metrics: {

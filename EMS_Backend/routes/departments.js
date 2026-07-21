@@ -3,19 +3,25 @@ const Department = require('../models/Department');
 const Employee = require('../models/Employee');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 const asyncHandler = require('../utils/asyncHandler');
+const { escapeRegex } = require('../utils/regex');
 
 const router = express.Router();
 
 // @route  GET /api/departments
-// @desc   Get all departments with employee counts
+// @desc   Get all departments with employee counts (Optimized aggregation)
 router.get('/', authMiddleware, asyncHandler(async (req, res) => {
-  const departments = await Department.find().sort({ name: 1 }).lean();
-  const departmentsWithCounts = await Promise.all(
-    departments.map(async (dept) => {
-      const count = await Employee.countDocuments({ department: dept._id });
-      return { ...dept, employeeCount: count };
-    })
-  );
+  const [departments, deptCounts] = await Promise.all([
+    Department.find().sort({ name: 1 }).lean(),
+    Employee.aggregate([{ $group: { _id: '$department', count: { $sum: 1 } } }])
+  ]);
+
+  const countMap = new Map(deptCounts.map(item => [item._id ? item._id.toString() : '', item.count]));
+
+  const departmentsWithCounts = departments.map((dept) => ({
+    ...dept,
+    employeeCount: countMap.get(dept._id.toString()) || 0
+  }));
+
   res.json(departmentsWithCounts);
 }));
 
@@ -45,7 +51,8 @@ router.post('/', authMiddleware, adminMiddleware, asyncHandler(async (req, res) 
     return res.status(409).json({ success: false, message: 'Department code already exists' });
   }
 
-  const existingName = await Department.findOne({ name: { $regex: new RegExp(`^${name.trim()}$`, 'i') } });
+  const escapedName = escapeRegex(name.trim());
+  const existingName = await Department.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
   if (existingName) {
     return res.status(409).json({ success: false, message: 'Department name already exists' });
   }
@@ -82,7 +89,8 @@ router.put('/:id', authMiddleware, adminMiddleware, asyncHandler(async (req, res
   }
 
   if (name && name.trim() !== department.name) {
-    const existingName = await Department.findOne({ name: { $regex: new RegExp(`^${name.trim()}$`, 'i') } });
+    const escapedName = escapeRegex(name.trim());
+    const existingName = await Department.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
     if (existingName) {
       return res.status(409).json({ success: false, message: 'Department name already exists' });
     }
