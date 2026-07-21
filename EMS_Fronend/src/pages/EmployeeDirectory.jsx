@@ -30,6 +30,7 @@ export default function EmployeeDirectory({ onMenuToggle }) {
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedDept, setSelectedDept] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
@@ -43,13 +44,22 @@ export default function EmployeeDirectory({ onMenuToggle }) {
 
   const navigate = useNavigate();
 
+  // Debounce search query input by 300ms
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
   useEffect(() => {
     fetchDepartments();
   }, []);
 
   useEffect(() => {
     fetchEmployees();
-  }, [searchQuery, selectedDept, selectedStatus, page]);
+  }, [debouncedSearchQuery, selectedDept, selectedStatus, page]);
 
   const fetchDepartments = async () => {
     try {
@@ -64,7 +74,7 @@ export default function EmployeeDirectory({ onMenuToggle }) {
     setLoading(true);
     try {
       const params = {
-        q: searchQuery,
+        q: debouncedSearchQuery,
         department: selectedDept,
         status: selectedStatus,
         page,

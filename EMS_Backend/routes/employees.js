@@ -5,8 +5,23 @@ const Department = require('../models/Department');
 const User = require('../models/User');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 const asyncHandler = require('../utils/asyncHandler');
+const { escapeRegex } = require('../utils/regex');
 
 const router = express.Router();
+
+// Helper to generate a unique employee ID sequentially
+const generateUniqueEmployeeId = async () => {
+  const lastEmp = await Employee.findOne({ employeeId: { $regex: /^EMP-\d+$/ } }).sort({ createdAt: -1 });
+  if (lastEmp && lastEmp.employeeId) {
+    const parts = lastEmp.employeeId.split('-');
+    const lastNum = parseInt(parts[1], 10);
+    if (!isNaN(lastNum)) {
+      return `EMP-${String(lastNum + 1).padStart(3, '0')}`;
+    }
+  }
+  const count = await Employee.countDocuments();
+  return `EMP-${String(count + 101).padStart(3, '0')}`;
+};
 
 // @route  GET /api/employees
 // @desc   Get all employees with filter, search, and pagination
@@ -14,8 +29,9 @@ router.get('/', authMiddleware, asyncHandler(async (req, res) => {
   const { q, department, status, sortBy = 'createdAt', sortOrder = 'desc', page = 1, limit = 50 } = req.query;
 
   const query = {};
-  if (q) {
-    const searchRegex = new RegExp(q.trim(), 'i');
+  if (q && q.trim()) {
+    const escapedQuery = escapeRegex(q.trim());
+    const searchRegex = new RegExp(escapedQuery, 'i');
     query.$or = [
       { firstName: searchRegex },
       { lastName: searchRegex },
@@ -84,11 +100,7 @@ router.post('/', authMiddleware, adminMiddleware, asyncHandler(async (req, res) 
     return res.status(400).json({ success: false, message: 'Specified department does not exist' });
   }
 
-  let empId = req.body.employeeId;
-  if (!empId) {
-    const count = await Employee.countDocuments();
-    empId = `EMP-${String(count + 101).padStart(3, '0')}`;
-  }
+  let empId = req.body.employeeId ? req.body.employeeId.toUpperCase().trim() : await generateUniqueEmployeeId();
 
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + ' ' + lastName)}&background=4f46e5&color=fff&size=150`;
 
