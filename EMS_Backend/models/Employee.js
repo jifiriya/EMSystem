@@ -17,9 +17,8 @@ const employeeSchema = new mongoose.Schema({
     name: { type: String, default: '' },
     phone: { type: String, default: '' },
     relation: { type: String, default: '' }
-  }
+  }})
 // Database Indexes for search performance & fast filtering
-employeeSchema.index({ department: 1, status: 1 });
 employeeSchema.index({ firstName: 1, lastName: 1, email: 1, employeeId: 1 });
 
 // Virtual full name
