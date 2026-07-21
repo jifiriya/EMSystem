@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd EMS_Fronend && npm install && npm run build",
+  "outputDirectory": "EMS_Fronend/dist"
+}
