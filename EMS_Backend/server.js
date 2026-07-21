@@ -11,7 +11,6 @@ const authRoutes = require('./routes/auth');
 const departmentRoutes = require('./routes/departments');
 const employeeRoutes = require('./routes/employees');
 const dashboardRoutes = require('./routes/dashboard');
-const seedDatabase = require('./seed');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -61,9 +60,7 @@ const initializeDB = async () => {
     console.log(`📡 Connecting to MongoDB at ${mongoUri}...`);
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 });
     console.log('✅ Successfully connected to MongoDB database!');
-    await seedDatabase();
   } catch (err) {
-    console.error('❌ CRITICAL ERROR: Database Connection Failed.');
     console.error(`Error Details: ${err.message}`);
     console.error('The application requires a working MongoDB database connection to function.');
     process.exit(1);
