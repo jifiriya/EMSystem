@@ -45,7 +45,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         />
       )}
 
-      <aside style={{
+      <aside className={`app-sidebar ${isOpen ? 'open' : ''}`} style={{
         width: '260px',
         backgroundColor: 'var(--bg-sidebar)',
         color: '#f8fafc',

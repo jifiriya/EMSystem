@@ -109,7 +109,7 @@ export default function DepartmentModal({ isOpen, onClose, onSave, departmentToE
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Department Name *</label>
                 <input 
@@ -135,7 +135,7 @@ export default function DepartmentModal({ isOpen, onClose, onSave, departmentToE
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Manager Name</label>
                 <input 

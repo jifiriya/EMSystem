@@ -16,8 +16,9 @@ const employeeSchema = new mongoose.Schema({
   emergencyContact: {
     name: { type: String, default: '' },
     phone: { type: String, default: '' },
-    relation: { type: String, default: '' }
-  }})
+  }
+}, { timestamps: true });
+
 // Database Indexes for search performance & fast filtering
 employeeSchema.index({ firstName: 1, lastName: 1, email: 1, employeeId: 1 });
 

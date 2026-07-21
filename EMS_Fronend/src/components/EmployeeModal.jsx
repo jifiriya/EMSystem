@@ -159,7 +159,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employeeToEdit 
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">First Name *</label>
                 <input 
@@ -185,7 +185,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employeeToEdit 
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Email Address *</label>
                 <input 
@@ -210,7 +210,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employeeToEdit 
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Job Title / Role *</label>
                 <input 
@@ -239,7 +239,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employeeToEdit 
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+            <div className="form-grid-3">
               <div className="form-group">
                 <label className="form-label">Employment Status</label>
                 <select 
