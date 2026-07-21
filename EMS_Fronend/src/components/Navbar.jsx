@@ -6,7 +6,7 @@ export default function Navbar({ onMenuToggle, title }) {
   const { user, theme, toggleTheme } = useAuth();
 
   return (
-    <header style={{
+    <header className="app-header" style={{
       height: '70px',
       backgroundColor: 'var(--bg-surface-glass)',
       backdropFilter: 'blur(12px)',
